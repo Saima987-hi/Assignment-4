@@ -1,7 +1,35 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@rendermode InteractiveServer
+<form>
+    <label>First name:</label><br />
+    <input type="text" @bind="firstname" placeholder="Enter your first name" required/><br />
+    <label>Last name:</label><br />
+    <input type="text" @bind="Lastname" @bind:event="oninput" placeholder="Enter your last name" required /><br />
+    <label>Email:</label><br />
+    <input type="email" @bind="Email" placeholder="Enter your Email name" /><br />
+    <hr>
+    <button @onclick="Register">Register</button>
+</form>
+@if(isRegister){
+    <div>
+<h3>View details</h3>
+<p>First name: @firstname</p>
+<p>Last name: @Lastname</p>
+<p>Email: @Email</p>
+    </div>
+}
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+@code {
+    private string firstname = "";
+    private string Lastname = "";
+    private string Email = "";
+    private bool isRegister = true;
+    void Register()
+    {
+        @if(!string.IsNullOrEmpty(firstname) && !string.IsNullOrEmpty(Lastname) && !string.IsNullOrEmpty(Email))
+        {
+            isRegister = true;
+        }
+    }
+}
