@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@using Application3.Models
 @rendermode InteractiveServer
 <div class="mb-3">
 
@@ -18,7 +18,14 @@
     {
         @foreach (var task in tasklist)
         {
-            <p>@task</p>
+            <ul>
+                <li style="list-style:none; margin-bottom:5px">
+                    <input type="checkbox" @bind="task.IsDone" />
+                    <span style="@(task.IsDone ? " text-decoration: line-through; color=gray" : "")">
+                        @task.Title
+                    </span>
+                </li>
+            </ul>
         }
     }
 </div>
@@ -26,13 +33,14 @@
 
 @code {
     private string Tasks = "";
-    private List<string> tasklist = new List<string>();
-    private bool isAdded = false;
+    private List<TodoItem> tasklist = new List<TodoItem>();
+
+
     void Add()
     {
         @if (Tasks != "")
         {
-            tasklist.Add(Tasks);
+            tasklist.Add(new TodoItem { Title = Tasks, IsDone = false });
             Tasks = "";
         }
     }
