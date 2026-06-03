@@ -1,69 +1,19 @@
-﻿@page "/Binding";
+﻿@page "/";
 
-@*
-<h1>one waya</h1>
-<input type="text" @value="name"/>
+@rendermode InteractiveServer
+<h1>one way</h1>
+<input type="text" @bind="tempname" />
 <p>Name: @name</p>
+@* two way *@
 <h3>Two way binding</h3>
-<input type="text" @bind="fname"" />
+<input type="text" @bind="fname" @bind:event="oninput" />
 <button @onclick="Changename">Change name</button>
 <p>Fname: @fname</p>
 @code {
-    private string name = "Saima";
-    private string fname = "Ali";
-    private void Changename() => (name, fname) = ("Sadia", "Khan");
-    
-      
-    
-} *@
-
-
-<h3>Application 1 - Data Binding in Blazor</h3>
-
-<!-- Two-Way Data Binding Section -->
-<h4>Two-Way Data Binding</h4>
-
-<label>Enter Your Name:</label>
-<input type="text" @bind="userName" placeholder="Type your name here" />
-
-<br />
-<br />
-
-<!-- One-Way Data Binding Section -->
-<h4>One-Way Data Binding</h4>
-
-<p>Greeting Message:</p>
-<h5>Hello, @userName! Welcome to Blazor.</h5>
-
-<hr />
-
-<!-- Explanation Section -->
-<h4>Explanation</h4>
-
-<p>
-    <b>Two-Way Data Binding:</b><br />
-    The input field uses <code>@userName</code> to connect the textbox with the
-    <code>userName</code> variable. Whenever the user types something,
-    the variable updates automatically.
-</p>
-
-<p>
-    <b>One-Way Data Binding:</b><br />
-    The greeting message uses <code>@userName</code> to display data from
-    the variable to the UI. It only shows the value and does not update
-    the variable directly.
-</p>
-
-<p>
-    <b>Difference:</b><br />
-    One-way binding transfers data from the variable to the UI only,
-    while two-way binding transfers data between the UI aend the variable
-    in both directions.
-</p>
-
-@code {
-
-    // Variable for storing user's name
-    private string userName = "";
-
+    private string name = "";
+    private string fname = "";
+    private string tempname = "";
+    private void Changename() => name = tempname;
 }
+
+
