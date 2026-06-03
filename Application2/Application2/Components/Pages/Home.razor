@@ -1,35 +1,54 @@
 ﻿@page "/"
-
 @rendermode InteractiveServer
-<form>
+
+<EditForm Model="registerModel" OnValidSubmit="Register">
+    <DataAnnotationsValidator />
+
     <label>First name:</label><br />
-    <input type="text" @bind="firstname" placeholder="Enter your first name" required/><br />
+    <InputText @bind-Value="registerModel.FirstName" placeholder="Enter your first name" /><br />
+    <ValidationMessage For="@(() => registerModel.FirstName)" /><br />
+
     <label>Last name:</label><br />
-    <input type="text" @bind="Lastname"  placeholder="Enter your last name" required /><br />
+    <InputText @bind-Value="registerModel.LastName" placeholder="Enter your last name" /><br />
+    <ValidationMessage For="@(() => registerModel.LastName)" /><br />
+
     <label>Email:</label><br />
-    <input type="email" @bind="Email" placeholder="Enter your Email name" /><br />
-    <hr>
-    <button @onclick="Register">Register</button>
-</form>
-@if(isRegister){
+    <InputText @bind-Value="registerModel.Email" placeholder="Enter your email" /><br />
+    <ValidationMessage For="@(() => registerModel.Email)" /><br />
+
+    <hr />
+    <button type="submit">Register</button>
+</EditForm>
+
+@if (isRegistered)
+{
     <div>
-<h3>View details</h3>
-<p>First name: @firstname</p>
-<p>Last name: @Lastname</p>
-<p>Email: @Email</p>
+        <h3>View details</h3>
+        <p>First name: @registerModel.FirstName</p>
+        <p>Last name: @registerModel.LastName</p>
+        <p>Email: @registerModel.Email</p>
     </div>
 }
 
 @code {
-    private string firstname = "";
-    private string Lastname = "";
-    private string Email = "";
-    private bool isRegister = true;
+    private RegisterModel registerModel = new();
+    private bool isRegistered = false;
+
     void Register()
     {
-        @if(!string.IsNullOrEmpty(firstname) && !string.IsNullOrEmpty(Lastname) && !string.IsNullOrEmpty(Email))
-        {
-            isRegister = true;
-        }
+        isRegistered = true;
+    }
+
+    public class RegisterModel
+    {
+        [Required(ErrorMessage = "First name is required.")]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Last name is required.")]
+        public string LastName { get; set; } = "";
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        public string Email { get; set; } = "";
     }
 }
