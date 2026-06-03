@@ -1,7 +1,43 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@rendermode InteractiveServer
+<div class="mb-3">
 
-<h1>Hello, world!</h1>
+    <label>Today task:</label><br />
+    <input type="text" @bind="Tasks" placeholder="Enter your task name" required />
+    <button @onclick="Add">Add Item</button>
+    <button @onclick="Clear">Clear </button>
+</div>
+<div>
+    <h3>View Tasks</h3>
+    @if (tasklist.Count == 0)
+    {
+        <p>Task list is empty</p>
+    }
+    else
+    {
+        @foreach (var task in tasklist)
+        {
+            <p>@task</p>
+        }
+    }
+</div>
 
-Welcome to your new app.
+
+@code {
+    private string Tasks = "";
+    private List<string> tasklist = new List<string>();
+    private bool isAdded = false;
+    void Add()
+    {
+        @if (Tasks != "")
+        {
+            tasklist.Add(Tasks);
+            Tasks = "";
+        }
+    }
+    void Clear()
+    {
+        tasklist.Clear();
+    }
+}
