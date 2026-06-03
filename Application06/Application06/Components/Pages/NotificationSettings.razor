@@ -1,0 +1,131 @@
+@page "/settings"
+@inject Application06.Models.NotificationConfig Config
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<div class="settings-page">
+    <div class="settings-card">
+
+        <div class="settings-header">
+            <div class="header-icon">
+                <i class="bi bi-sliders"></i>
+            </div>
+            <div>
+                <h2>Notification Settings</h2>
+                <p>Customize how notifications appear across the app</p>
+            </div>
+        </div>
+
+        <div class="settings-body">
+
+            <!-- Number of Notifications -->
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="bi bi-123"></i>
+                    Default Number of Notifications
+                </label>
+                <p class="setting-desc">How many notifications to show by default on the display page.</p>
+                <div class="number-control">
+                    <button class="num-btn" @onclick="Decrement" disabled="@(_tempCount <= 1)">−</button>
+                    <input type="number" class="num-input"
+                           @bind="_tempCount"
+                           min="1" max="10" />
+                    <button class="num-btn" @onclick="Increment" disabled="@(_tempCount >= 10)">+</button>
+                </div>
+                <span class="range-hint">Range: 1 – 10</span>
+            </div>
+
+            <!-- Notification Style -->
+            <div class="setting-group">
+                <label class="setting-label">
+                    <i class="bi bi-layout-text-sidebar"></i>
+                    Notification Style
+                </label>
+                <p class="setting-desc">Choose how each notification card is displayed.</p>
+                <div class="style-options">
+                    <div class="style-card @(_tempStyle == "Compact" ? "active" : "")"
+                         @onclick='() => _tempStyle = "Compact"'>
+                        <i class="bi bi-list-ul"></i>
+                        <span class="style-name">Compact</span>
+                        <span class="style-info">Single line, minimal info</span>
+                    </div>
+                    <div class="style-card @(_tempStyle == "Detailed" ? "active" : "")"
+                         @onclick='() => _tempStyle = "Detailed"'>
+                        <i class="bi bi-card-text"></i>
+                        <span class="style-name">Detailed</span>
+                        <span class="style-info">Full message with metadata</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Config Preview -->
+            <div class="config-preview">
+                <div class="preview-title"><i class="bi bi-eye"></i> Live Preview</div>
+                <div class="preview-row">
+                    <span>Notifications</span>
+                    <span class="preview-val">@_tempCount</span>
+                </div>
+                <div class="preview-row">
+                    <span>Style</span>
+                    <span class="preview-val badge-@_tempStyle.ToLower()">@_tempStyle</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="settings-footer">
+            <button class="btn-secondary" @onclick="ResetDefaults">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+            <button class="btn-primary" @onclick="SaveSettings">
+                <i class="bi bi-save2"></i> Save & Apply
+            </button>
+        </div>
+
+        @if (_saved)
+        {
+            <div class="toast-success">
+                <i class="bi bi-check-circle-fill"></i> Settings saved successfully!
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private int _tempCount;
+    private string _tempStyle = "Compact";
+    private bool _saved = false;
+
+    protected override void OnInitialized()
+    {
+        _tempCount = Config.DefaultNumberOfNotifications;
+        _tempStyle  = Config.NotificationStyle;
+    }
+
+    private void Increment()
+    {
+        if (_tempCount < 10) _tempCount++;
+    }
+
+    private void Decrement()
+    {
+        if (_tempCount > 1) _tempCount--;
+    }
+
+    private void ResetDefaults()
+    {
+        _tempCount  = 5;
+        _tempStyle  = "Compact";
+        _saved = false;
+    }
+
+    private async Task SaveSettings()
+    {
+        Config.DefaultNumberOfNotifications = _tempCount;
+        Config.NotificationStyle            = _tempStyle;
+        _saved = true;
+        await Task.Delay(2500);
+        _saved = false;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,114 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="app-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="navbar-brand">
+            <div class="brand-icon">
+                <i class="bi bi-palette-fill"></i>
+            </div>
+            <span class="brand-name">Application7</span>
+            <span class="brand-sub">Theme Switcher</span>
+        </div>
+
+        <div class="navbar-center">
+            <nav class="nav-links">
+                <a href="/" class="nav-item">
+                    <i class="bi bi-house-fill"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/about" class="nav-item">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>About</span>
+                </a>
+                <a href="/demo" class="nav-item">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Components</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="navbar-right">
+            <!-- Theme Status Pill -->
+            <div class="theme-status-pill">
+                <i class="bi @(_isDark ? "bi-moon-stars-fill" : "bi-sun-fill")"></i>
+                <span>@(_isDark ? "Dark" : "Light") Mode</span>
+            </div>
+
+            <!-- Toggle Button -->
+            <button class="theme-toggle-btn" @onclick="ToggleTheme" title="Toggle Theme">
+                <div class="toggle-track">
+                    <div class="toggle-thumb @(_isDark ? "thumb-right" : "thumb-left")">
+                        <i class="bi @(_isDark ? "bi-moon-fill" : "bi-sun-fill")"></i>
+                    </div>
+                    <span class="toggle-label-left"><i class="bi bi-sun-fill"></i></span>
+                    <span class="toggle-label-right"><i class="bi bi-moon-fill"></i></span>
+                </div>
+            </button>
+
+            <button class="btn-switch-text" @onclick="ToggleTheme">
+                <i class="bi @(_isDark ? "bi-sun-fill" : "bi-moon-stars-fill")"></i>
+                Switch to @(_isDark ? "Light" : "Dark") Mode
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @Body
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <span>Application7 — Blazor Theme Switcher</span>
+            <span class="footer-sep">•</span>
+            <span>Theme stored in <code>localStorage</code></span>
+            <span class="footer-sep">•</span>
+            <span>Current: <strong>@(_isDark ? "Dark Mode" : "Light Mode")</strong></span>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool _isDark = false;
+    private IJSObjectReference? _jsModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var saved = await JS.InvokeAsync<string>("localStorage.getItem", "app-theme");
+                _isDark = saved == "dark";
+                await ApplyTheme(false);
+                StateHasChanged();
+            }
+            catch { /* JS not ready yet */ }
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        _isDark = !_isDark;
+        await ApplyTheme(true);
+    }
+
+    private async Task ApplyTheme(bool save)
+    {
+        var cls = _isDark ? "dark-mode" : "light-mode";
+        await JS.InvokeVoidAsync("eval",
+            $"document.body.className = '{cls}';");
+        if (save)
+            await JS.InvokeVoidAsync("localStorage.setItem", "app-theme", _isDark ? "dark" : "light");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+            await _jsModule.DisposeAsync();
+    }
+}
