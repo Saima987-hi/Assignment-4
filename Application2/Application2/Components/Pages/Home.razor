@@ -5,11 +5,11 @@
     <label>First name:</label><br />
     <input type="text" @bind="firstname" placeholder="Enter your first name" required/><br />
     <label>Last name:</label><br />
-    <input type="text" @bind="Lastname" @bind:event="oninput" placeholder="Enter your last name" required /><br />
+    <input type="text" @bind="Lastname"  placeholder="Enter your last name" required /><br />
     <label>Email:</label><br />
     <input type="email" @bind="Email" placeholder="Enter your Email name" /><br />
     <hr>
-    
+    <button @onclick="Register">Register</button>
 </form>
 @if(isRegister){
     <div>
