@@ -1,12 +1,12 @@
 ﻿@page "/";
 
 @rendermode InteractiveServer
-<h1>one way</h1>
+<h1>One way</h1>
 <input type="text" @bind="tempname" />
 <p>Name: @name</p>
 @* two way *@
 <h3>Two way binding</h3>
-<input type="text" @bind="fname" @bind:event="oninput" />
+<input type="text" @bind="fname" @bind:event="oninput"/>
 <button @onclick="Changename">Change name</button>
 <p>Fname: @fname</p>
 @code {
@@ -15,5 +15,3 @@
     private string tempname = "";
     private void Changename() => name = tempname;
 }
-
-

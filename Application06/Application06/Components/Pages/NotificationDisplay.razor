@@ -2,6 +2,7 @@
 @inject Application06.Services.NotificationService NotifService
 @inject Application06.Models.NotificationConfig Config
 @rendermode InteractiveServer
+
 <div class="display-page">
 
     <!-- Toolbar -->
@@ -83,7 +84,7 @@
                     <!-- COMPACT VIEW -->
                     <div class="notif-compact @(n.IsRead ? "" : "unread")">
                         <div class="notif-dot" style="background:@n.BadgeColor"></div>
-                        <div class="compact-icon" style="background:@n.BadgeColor ">
+                        <div class="compact-icon" style="background:@(n.BadgeColor + "22")">
                             <i class="bi @n.IconClass" style="color:@n.BadgeColor"></i>
                         </div>
                         <div class="compact-body">
@@ -103,7 +104,7 @@
                 {
                     <!-- DETAILED VIEW -->
                     <div class="notif-detailed @(n.IsRead ? "" : "unread")">
-                        <div class="detail-sidebar" style="background:@n.BadgeColor + "22"">
+                        <div class="detail-sidebar" style="background:@(n.BadgeColor + "18")">
                             <div class="detail-icon-wrap" style="background:@n.BadgeColor">
                                 <i class="bi @n.IconClass"></i>
                             </div>
@@ -121,7 +122,7 @@
                                     {
                                         <span class="badge-read">Read</span>
                                     }
-                                    <span class="badge-cat" style="background:@n.BadgeColor + "22"; color:@n.BadgeColor">@n.Category</span>
+                                    <span class="badge-cat" style="background:@(n.BadgeColor + "18"); color:@n.BadgeColor">@n.Category</span>
                                 </div>
                             </div>
                             <p class="detail-msg">@n.Message</p>
@@ -155,7 +156,7 @@
     private async Task LoadNotifications()
     {
         _loading = true;
-        await Task.Delay(400); // simulate async fetch
+        await Task.Delay(400);
         _notifications = await NotifService.GetNotificationsAsync(_currentCount);
         _loading = false;
     }
