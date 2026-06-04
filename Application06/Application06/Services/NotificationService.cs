@@ -6,7 +6,6 @@ namespace Application06.Services
     {
         private readonly NotificationConfig _config;
 
-        // Simulated notification data pool
         private static readonly List<Notification> _notificationPool = new()
         {
             new Notification { Id = 1,  Title = "New Message",       Message = "You have received a new message from Ali Hassan. He wants to discuss the project timeline.",          Category = "Message",  Timestamp = DateTime.Now.AddMinutes(-2),  IsRead = false, IconClass = "bi-envelope-fill",      BadgeColor = "#4f8ef7" },

@@ -1,0 +1,26 @@
+@rendermode InteractiveServer
+@inject Application5.Services.AuthenticationStateService AuthService
+@implements IDisposable
+
+<h3>User Profile Component</h3>
+
+@if (AuthService.IsAuthenticated)
+{
+    <p>Welcome! You are logged in.</p>
+}
+else
+{
+    <p>Please log in to view your profile.</p>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= StateHasChanged;
+    }
+}

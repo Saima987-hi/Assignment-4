@@ -12,3 +12,4 @@ namespace Application06.Models
         public string BadgeColor { get; set; } = string.Empty;
     }
 }
+

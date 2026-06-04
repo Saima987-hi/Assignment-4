@@ -1,0 +1,38 @@
+@rendermode InteractiveServer
+@inject Application5.Services.AuthenticationStateService AuthService
+@implements IDisposable
+
+<h3>Login Component</h3>
+
+@if (AuthService.IsAuthenticated)
+{
+    <p>You are currently <strong>Logged In</strong>.</p>
+    <button class="btn btn-danger" @onclick="LogOut">Log Out</button>
+}
+else
+{
+    <p>You are currently <strong>Logged Out</strong>.</p>
+    <button class="btn btn-primary" @onclick="LogIn">Log In</button>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += StateHasChanged;
+    }
+
+    private void LogIn()
+    {
+        AuthService.LogIn();
+    }
+
+    private void LogOut()
+    {
+        AuthService.LogOut();
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= StateHasChanged;
+    }
+}
