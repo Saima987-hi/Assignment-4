@@ -11,13 +11,11 @@ namespace Application5.Services
             IsAuthenticated = true;
             NotifyStateChanged();
         }
-
         public void LogOut()
         {
             IsAuthenticated = false;
             NotifyStateChanged();
         }
-
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }
