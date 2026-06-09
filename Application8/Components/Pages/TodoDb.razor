@@ -1,0 +1,537 @@
+@page "/todo-db"
+@rendermode InteractiveServer
+@inject Application8.Services.TodoDbService DbService
+
+<PageTitle>Todo – TaskDB</PageTitle>
+
+<div class="todo-container">
+    <!-- Header Space -->
+    <div class="todo-header">
+        <h2>✨ My Day</h2>
+        <p>Stay focused, be productive</p>
+    </div>
+
+    <!-- Add Task Input -->
+    <div class="todo-input-row">
+        <div class="input-wrapper">
+            <span class="input-icon">✏️</span>
+            <input class="form-control unique-input"
+                   @bind="newTask"
+                   @bind:event="oninput"
+                   @onkeydown="HandleKeyDown"
+                   placeholder="Type a new task and press Enter..." />
+        </div>
+        <button class="btn btn-unique-add" @onclick="AddTask" disabled="@string.IsNullOrWhiteSpace(newTask)">
+            <span class="btn-icon-plus">＋</span> Add
+        </button>
+    </div>
+
+    <!-- Edit Panel (Modal-style overlay or inline card) -->
+    @if (editingId.HasValue)
+    {
+        <div class="edit-card-overlay">
+            <div class="edit-card">
+                <label><span class="edit-icon">📝</span> Edit Task Title</label>
+                <input class="form-control unique-input" @bind="editText" />
+                <div class="mt-3 edit-actions">
+                    <button class="btn-unique-save" @onclick="SaveEdit">💾 Save Changes</button>
+                    <button class="btn-unique-cancel" @onclick="CancelEdit">✕ Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Task List Section -->
+    @if (tasks.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-icon">🎨</div>
+            <p class="empty-title">All clean here!</p>
+            <p class="empty-subtitle">Your mind is clear. Add a task to get started.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Stats bar -->
+        <div class="stats-bar">
+            <div class="stats-pills">
+                <span class="stat-pill total"><strong>@tasks.Count</strong> Total</span>
+                <span class="stat-pill done"><strong>@tasks.Count(t => t.IsCompleted)</strong> Done</span>
+                <span class="stat-pill pending"><strong>@tasks.Count(t => !t.IsCompleted)</strong> Pending</span>
+            </div>
+            <button class="btn-clear-all" @onclick="ClearAll">🗑️ Clear All</button>
+        </div>
+
+        <ul class="task-list">
+            @foreach (var item in tasks)
+            {
+                <li class="task-item @(item.IsCompleted ? "completed" : "")">
+                    <div class="task-content">
+                        <label class="checkbox-container">
+                            <input type="checkbox"
+                                   class="task-check"
+                                   @bind="item.IsCompleted"
+                                   @bind:after="() => UpdateTask(item)" />
+                            <span class="checkmark"></span>
+                        </label>
+
+                        <div class="task-details">
+                            <span class="task-text @(item.IsCompleted ? "done" : "")">@item.Task</span>
+                            <span class="task-date">🕒 @item.CreatedAt.ToString("dd MMM, hh:mm tt")</span>
+                        </div>
+                    </div>
+
+                    <div class="task-actions">
+                        <button class="btn-icon btn-edit" @onclick="() => StartEdit(item)" title="Edit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                        <button class="btn-icon btn-del" @onclick="() => DeleteTask(item.Id)" title="Delete">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<style>
+    /* Unique Dashboard Styling */
+    .todo-container {
+        max-width: 680px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .todo-header h2 {
+        font-weight: 700;
+        color: #1e1e2f;
+        margin-bottom: 0.2rem;
+        letter-spacing: -0.5px;
+    }
+
+    .todo-header p {
+        color: #8c8da2;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Modernized Input Wrapper */
+    .todo-input-row {
+        display: flex;
+        gap: 0.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        flex: 1;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        opacity: 0.7;
+    }
+
+    .unique-input {
+        width: 100%;
+        padding: 0.85rem 1rem 0.85rem 2.6rem !important;
+        border-radius: 14px !important;
+        border: 2px solid #eef0f6 !important;
+        background-color: #f9faff !important;
+        font-size: 0.98rem;
+        transition: all 0.25s ease;
+    }
+
+        .unique-input:focus {
+            border-color: #6366f1 !important;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+            outline: none;
+        }
+
+    /* Fluid Buttons */
+    .btn-unique-add {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border: none;
+        padding: 0 1.8rem;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .btn-unique-add:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-unique-add:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+    /* Stats Bar Customization */
+    .stats-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-pills {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .stat-pill {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+        .stat-pill.total {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .stat-pill.done {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .stat-pill.pending {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+    .btn-clear-all {
+        background: none;
+        border: none;
+        color: #ef4444;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+        .btn-clear-all:hover {
+            background: #fef2f2;
+        }
+
+    /* Task List Style */
+    .task-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .task-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.2rem;
+        background: #ffffff;
+        border: 1px solid #f1f5f9;
+        border-radius: 16px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .task-item:hover {
+            transform: scale(1.01) translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+            border-color: #e2e8f0;
+        }
+
+        .task-item.completed {
+            background: #fafafa;
+            border-color: #f1f5f9;
+        }
+
+    .task-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Custom Unique Checkbox */
+    .checkbox-container {
+        position: relative;
+        cursor: pointer;
+        display: block;
+        width: 22px;
+        height: 22px;
+    }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 22px;
+        width: 22px;
+        background-color: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-container:hover input ~ .checkmark {
+        border-color: #6366f1;
+    }
+
+    .checkbox-container input:checked ~ .checkmark {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .checkbox-container input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Text details inside row */
+    .task-details {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .task-text {
+        font-size: 0.98rem;
+        color: #334155;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .task-text.done {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+    .task-date {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        margin-top: 0.15rem;
+    }
+
+    /* SVG icon actions */
+    .task-actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+
+    .btn-icon {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 10px;
+        cursor: pointer;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+        .btn-icon:hover {
+            background: #f1f5f9;
+        }
+
+    .btn-edit:hover {
+        color: #4f46e5;
+    }
+
+    .btn-del:hover {
+        color: #ef4444;
+    }
+
+    /* Modal Edit Overlay Styling */
+    .edit-card-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.3);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .edit-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+        .edit-card label {
+            display: block;
+            font-weight: 600;
+            color: #1e1e2f;
+            margin-bottom: 0.8rem;
+        }
+
+    .edit-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-unique-save {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-unique-cancel {
+        background: #f1f5f9;
+        color: #64748b;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    /* Empty state alignment */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-title {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.25rem;
+    }
+
+    .empty-subtitle {
+        font-size: 0.88rem;
+        color: #94a3b8;
+    }
+</style>
+
+@code {
+    private List<Application8.Models.TodoItem> tasks = new();
+    private string newTask = string.Empty;
+    private int? editingId = null;
+    private string editText = string.Empty;
+
+    protected override void OnInitialized() => LoadTasks();
+
+    private void LoadTasks() => tasks = DbService.GetAll();
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddTask();
+    }
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTask))
+        {
+            DbService.Add(newTask.Trim());
+            newTask = string.Empty;
+            LoadTasks();
+        }
+    }
+
+    private void DeleteTask(int id)
+    {
+        DbService.Delete(id);
+        LoadTasks();
+    }
+
+    private void UpdateTask(Application8.Models.TodoItem item)
+    {
+        DbService.Update(item.Id, item.Task, item.IsCompleted);
+        LoadTasks();
+    }
+
+    private void ClearAll()
+    {
+        DbService.DeleteAll();
+        LoadTasks();
+    }
+
+    private void StartEdit(Application8.Models.TodoItem item)
+    {
+        editingId = item.Id;
+        editText = item.Task;
+    }
+
+    private void SaveEdit()
+    {
+        if (editingId.HasValue && !string.IsNullOrWhiteSpace(editText))
+        {
+            var item = tasks.First(t => t.Id == editingId.Value);
+            DbService.Update(editingId.Value, editText.Trim(), item.IsCompleted);
+            editingId = null;
+            LoadTasks();
+        }
+    }
+
+    private void CancelEdit() => editingId = null;
+}

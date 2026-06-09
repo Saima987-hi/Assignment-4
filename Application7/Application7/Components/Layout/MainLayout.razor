@@ -1,47 +1,5 @@
 @inherits LayoutComponentBase
-@inject IJSRuntime JS
-@rendermode InteractiveServer
-@implements IAsyncDisposable
 
-<button class="theme-btn" @onclick="ToggleTheme">
-    @buttonLabel
-</button>
+<ThemeToggle />
 
 @Body
-
-<script>
-    window.themeHelper = {
-        setTheme: function (theme) {
-            document.body.className = theme;
-            localStorage.setItem('theme', theme);
-        },
-        getTheme: function () {
-            return localStorage.getItem('theme') || 'light';
-        }
-    };
-</script>
-
-@code {
-    private string currentTheme = "light";
-    private string buttonLabel = "Switch to Dark Mode";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            currentTheme = await JS.InvokeAsync<string>("themeHelper.getTheme");
-            await JS.InvokeVoidAsync("themeHelper.setTheme", currentTheme);
-            buttonLabel = currentTheme == "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
-            StateHasChanged();
-        }
-    }
-
-    private async Task ToggleTheme()
-    {
-        currentTheme = currentTheme == "light" ? "dark" : "light";
-        buttonLabel = currentTheme == "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
-        await JS.InvokeVoidAsync("themeHelper.setTheme", currentTheme);
-    }
-
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
-}

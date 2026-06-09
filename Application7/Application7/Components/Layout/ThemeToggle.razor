@@ -1,0 +1,27 @@
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<button class="theme-btn" @onclick="ToggleTheme">@buttonlable</button>
+
+@code{
+    private  string Theme="light";
+    private string buttonlable="Switch to Dark mode";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Theme = await JS.InvokeAsync<string>("themeHelper.applyStoredTheme");
+
+            buttonlable = Theme == "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
+            StateHasChanged();
+        }
+    }
+    private async Task ToggleTheme()
+    {
+        Theme = Theme == "light" ? "dark" : "light";
+         buttonlable = Theme == "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
+        await JS.InvokeVoidAsync("themeHelper.setTheme", Theme);
+    }
+}
+

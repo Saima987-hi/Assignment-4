@@ -1,0 +1,248 @@
+/* =====================================================
+   App8 – Todo with Database  |  Custom Theme
+   ===================================================== */
+
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+html, body {
+    font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d3250;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Links & Primary Button ---------- */
+a, .btn-link {
+    color: #5b67f7;
+}
+
+.btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #5b67f7 0%, #7c3aed 100%);
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    box-shadow: 0 4px 14px rgba(91,103,247,.35);
+    transition: transform .15s, box-shadow .15s;
+}
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(91,103,247,.45);
+    background: linear-gradient(135deg, #4a56e8 0%, #6d28d9 100%);
+}
+
+/* ---------- Focus rings ---------- */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.15rem rgba(91,103,247,.3);
+    border-color: #5b67f7;
+}
+
+/* ---------- Content area ---------- */
+.content {
+    padding-top: 1.4rem;
+}
+
+h1:focus { outline: none; }
+
+/* ---------- Validation ---------- */
+.valid.modified:not([type=checkbox]) { outline: 1px solid #22c55e; }
+.invalid                              { outline: 1px solid #ef4444; }
+.validation-message                   { color: #ef4444; }
+
+/* ---------- Blazor error ---------- */
+.blazor-error-boundary {
+    background: #fef2f2;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: #b91c1c;
+    border-left: 4px solid #ef4444;
+    border-radius: 8px;
+}
+.blazor-error-boundary::after { content: "An error has occurred." }
+
+/* ---------- Checkbox ---------- */
+.darker-border-checkbox.form-check-input { border-color: #929292; }
+
+/* ===================================================
+   Todo Page Styles
+   =================================================== */
+
+/* Hero card wrapping the whole page content */
+.todo-hero {
+    background: linear-gradient(135deg, #5b67f7 0%, #7c3aed 100%);
+    border-radius: 20px;
+    padding: 2rem 2.5rem 1.5rem;
+    color: #fff;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 8px 32px rgba(91,103,247,.3);
+}
+.todo-hero h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 .3rem;
+}
+.todo-hero p {
+    margin: 0;
+    opacity: .85;
+    font-size: .92rem;
+}
+
+/* Input area */
+.todo-input-row {
+    display: flex;
+    gap: .6rem;
+    margin-bottom: 1.4rem;
+}
+.todo-input-row .form-control {
+    border-radius: 12px;
+    border: 2px solid #e2e6ff;
+    padding: .65rem 1rem;
+    font-size: .95rem;
+    transition: border-color .2s;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(91,103,247,.07);
+}
+.todo-input-row .form-control:focus {
+    border-color: #5b67f7;
+    box-shadow: 0 0 0 3px rgba(91,103,247,.15);
+}
+.todo-input-row .btn {
+    border-radius: 12px;
+    padding: .65rem 1.4rem;
+    white-space: nowrap;
+}
+
+/* Edit card */
+.edit-card {
+    background: #fffbeb;
+    border: 2px solid #fbbf24;
+    border-radius: 14px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.3rem;
+    box-shadow: 0 3px 12px rgba(251,191,36,.18);
+}
+.edit-card label {
+    font-weight: 600;
+    color: #92400e;
+    font-size: .88rem;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+.edit-card .form-control {
+    border-radius: 10px;
+    border: 2px solid #fcd34d;
+    margin-top: .4rem;
+}
+
+/* Task list */
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+}
+.task-item {
+    background: #fff;
+    border-radius: 14px;
+    padding: .85rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 12px rgba(45,50,80,.07);
+    border-left: 4px solid #5b67f7;
+    transition: box-shadow .2s, transform .15s;
+}
+.task-item:hover {
+    box-shadow: 0 4px 18px rgba(45,50,80,.12);
+    transform: translateY(-1px);
+}
+.task-item.completed {
+    border-left-color: #22c55e;
+    opacity: .75;
+}
+
+.task-check {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #5b67f7;
+    cursor: pointer;
+    margin-right: .7rem;
+    flex-shrink: 0;
+}
+.task-text {
+    font-size: .97rem;
+    font-weight: 500;
+}
+.task-text.done {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-weight: 400;
+}
+.task-date {
+    font-size: .76rem;
+    color: #a0aec0;
+    margin-left: .5rem;
+}
+
+/* Action buttons on each task */
+.task-actions { display: flex; gap: .4rem; flex-shrink: 0; }
+.btn-icon {
+    border-radius: 9px;
+    padding: .32rem .6rem;
+    font-size: .82rem;
+    border: none;
+    cursor: pointer;
+    transition: transform .12s, opacity .12s;
+}
+.btn-icon:hover { transform: scale(1.12); opacity: .9; }
+.btn-edit  { background: #e0e7ff; color: #4338ca; }
+.btn-del   { background: #fee2e2; color: #dc2626; }
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #9ca3af;
+}
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: .6rem; }
+.empty-state p { font-size: .95rem; }
+
+/* Clear All button */
+.btn-clear-all {
+    background: #fff0f0;
+    color: #ef4444;
+    border: 1.5px solid #fecaca;
+    border-radius: 10px;
+    padding: .5rem 1.2rem;
+    font-size: .88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .18s;
+}
+.btn-clear-all:hover { background: #fee2e2; }
+
+/* Save / Cancel buttons */
+.btn-save {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: .4rem .9rem;
+    font-size: .88rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(34,197,94,.25);
+}
+.btn-cancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 9px;
+    padding: .4rem .9rem;
+    font-size: .88rem;
+    cursor: pointer;
+}

@@ -1,4 +1,4 @@
-/* Light Mode (default) */
+/* Light Mode */
 body.light {
     background-color: #ffffff;
     color: #000000;
@@ -10,7 +10,7 @@ body.dark {
     color: #ffffff;
 }
 
-/* Button style */
+/* Toggle Button */
 .theme-btn {
     padding: 8px 16px;
     font-size: 14px;

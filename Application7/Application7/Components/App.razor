@@ -9,8 +9,24 @@
     <link rel="stylesheet" href="css/app.css" />
 </head>
 
-<body>
+<body class="light">
     <Routes />
+    <script>
+        window.themeHelper = {
+            getTheme: function () {
+                return localStorage.getItem('theme') || 'light';
+            },
+            setTheme: function (theme) {
+                document.body.className = theme;
+                localStorage.setItem('theme', theme);
+            },
+            applyStoredTheme: function () {
+                var t = localStorage.getItem('theme') || 'light';
+                document.body.className = t;
+                return t;
+            }
+        };
+    </script>
     <script src="_framework/blazor.web.js"></script>
 </body>
 
